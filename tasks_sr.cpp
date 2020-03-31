@@ -103,11 +103,13 @@ void A_input(pkt packet) {
             stoptimer(0, bufferA[packet.acknum].packet.payload);
             starttimer(0, bufferA[senderBase].timestamp + TIMEOUT - getSimTime(), bufferA[senderBase].packet.payload);
         }
+    }else {
+        cout << "A recieved corrupt ACK" << endl;
     }
 }
 
 void earliestPacketUnAck() {
-    float leastTime = bufferA[0].timestamp;
+    float leastTime = bufferA[nxtSeqNum-1].timestamp;
     for(int i = 0; i< WINDOWSIZE+senderBase; i++){
         if(bufferA[i].ack ==0 && bufferA[i].timestamp != 0 && bufferA[i].timestamp < leastTime){
             leastTime = bufferA[i].timestamp;
@@ -121,8 +123,8 @@ void A_timerinterrupt(void *adata) {
     cout << "A timeout sending earliest unAck'd pkt" << endl;
     earliestPacketUnAck();
     tolayer3(0, bufferA[earlistSendUnackedIndex].packet);
-    cout << "packet num: " << earlistSendUnackedIndex << "sendtime" << bufferA[earlistSendUnackedIndex].timestamp << endl;
-    starttimer(0, bufferA[earlistSendUnackedIndex].timestamp + TIMEOUT - getSimTime(), bufferA[earlistSendUnackedIndex].packet.payload);
+    cout << "packet num: " << earlistSendUnackedIndex << ", sendtime: " << bufferA[earlistSendUnackedIndex].timestamp << endl;
+    starttimer(0, TIMEOUT, bufferA[earlistSendUnackedIndex].packet.payload);
 }
 
 /* the following routine will be called once (only) before any other */
@@ -133,7 +135,7 @@ void A_init() {}
 void B_input(pkt packet) {
     cout << "B recieved pkt: ";
     printArr(packet.payload);
-    cout << " packet seq num: " << packet.seqnum << ", packet acknum: " << packet.acknum;
+    cout << " packet seq num: " << packet.seqnum << ", packet acknum: " << packet.acknum << endl;
     struct pkt newPkt;
     if(packet.checksum == checksum(packet)){
         if(bufferB[packet.seqnum].ack != 1){
@@ -147,7 +149,7 @@ void B_input(pkt packet) {
                 bufferB[recBase].packet = packet;
                 bufferB[recBase].ack = 1;
                 while(bufferB[recBase].ack == 1){
-                    cout << "Delivering message";
+                    cout << "Delivering message: ";
                     printArr(bufferB[recBase].packet.payload);
                     tolayer5(1, bufferB[recBase].packet.payload);
                     recBase++;
@@ -162,7 +164,7 @@ void B_input(pkt packet) {
             newPkt.acknum = packet.seqnum;
             newPkt.seqnum = 0;
             memset(newPkt.payload, 0, 20);
-            newPkt.checksum = checksum(packet);
+            newPkt.checksum = checksum(newPkt);
             tolayer3(1, newPkt);
         }
     }else {
