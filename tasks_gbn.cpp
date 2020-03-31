@@ -30,12 +30,10 @@ implementing selective repeat
 
 /********* STUDENTS WRITE THE NEXT SIX ROUTINES *********/
 
-int windowSize;
 int nxtSeqNum = 0;
 int base = 0;
 
 int expSeqNum;
-float increment = 25.0;
 
 std::vector<pkt> buffer;
 
@@ -58,7 +56,7 @@ void printArr(char * array){
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(msg message) {
-    cout << "A_out sending data from layer5";
+    cout << "A_out sending data from layer5" << endl;
     struct pkt newPacket;
     for(int i =0; i<20; i++){
         newPacket.payload[i] = message.data[i];
@@ -66,16 +64,16 @@ void A_output(msg message) {
     buffer.push_back(newPacket);
     cout << "AOutput Next SeqNum" << nxtSeqNum << endl;
     cout << "AOutput base" << base << endl;
-    cout << "AOutput win size" << windowSize << endl;
-    if(nxtSeqNum < base + windowSize){
+    cout << "AOutput win size" << WINDOWSIZE << endl;
+    if(nxtSeqNum < base + WINDOWSIZE){
         buffer[nxtSeqNum].seqnum = nxtSeqNum;
         buffer[nxtSeqNum].acknum = 0;
         buffer[nxtSeqNum].checksum = checksum(buffer[nxtSeqNum]);
         cout << "A sending packet: ";
-        printArr(newPacket.payload);
+        printArr(buffer[nxtSeqNum].payload);
         tolayer3(0,buffer[nxtSeqNum]);
         if(base == nxtSeqNum){
-            starttimer(0, increment, newPacket.payload);
+            starttimer(0, TIMEOUT, buffer[nxtSeqNum].payload);
         }
         nxtSeqNum++;
     }else {
@@ -91,7 +89,7 @@ void A_input(pkt packet) {
             stoptimer(0, packet.payload);
         }else {
             stoptimer(0, packet.payload);
-            starttimer(0, increment, packet.payload);
+            starttimer(0, TIMEOUT, packet.payload);
         }
     } else {
         cout << "Corrupted Packet, waiting" << endl;
@@ -100,8 +98,8 @@ void A_input(pkt packet) {
 
 /* called when A's timer goes off */
 void A_timerinterrupt(void *adata) {
-    starttimer(0, increment, adata);
-    for(int i =0; i < nxtSeqNum; i++){
+    starttimer(0, TIMEOUT, adata);
+    for(int i =base; i < nxtSeqNum; i++){
         tolayer3(0, buffer[i]);
     }
 }
@@ -109,7 +107,6 @@ void A_timerinterrupt(void *adata) {
 /* the following routine will be called once (only) before any other */
 /* entity A routines are called. You can use it to do any initialization */
 void A_init() {
-    windowSize = 8;
 }
 
 /* called from layer 3, when a packet arrives for layer 4 at B*/

@@ -34,7 +34,6 @@ implementing selective repeat
 
 int expSeqNum;
 int seqCurr = 0;
-float increment = 15.0;
 int resendMsg = 0;
 int FSM = 0;
 struct msg lastMsg;
@@ -62,8 +61,8 @@ void A_output(msg message) {
     struct pkt newPacket;
     newPacket.seqnum = seqCurr % 2;
     newPacket.acknum = 0;
-    if(FSM == 1){
-        if(buffer.size > 0){
+    if(FSM == 0){
+        if(buffer.size() > 0){
             cout << "Buffer not empty" << endl;
             struct msg messageCurr;
             messageCurr = buffer.front();
@@ -76,7 +75,7 @@ void A_output(msg message) {
             printArr(message.data);
             buffer.push(message);
             newPacket.checksum = checksum(newPacket);
-            starttimer(0, increment, newPacket.payload);
+            starttimer(0, TIMEOUT, newPacket.payload);
             tolayer3(0, newPacket);
             FSM = 1;
             cout << "sending message:";
@@ -84,19 +83,18 @@ void A_output(msg message) {
         }else {
             cout << "Buffer is empty" << endl;
             printArr(message.data);
-            for(int i =0;; i<sizeof(message.data); i++){
+            for(int i =0; i<sizeof(message.data); i++){
                 newPacket.payload[i] = message.data[i];
                 lastMsg.data[i] = message.data[i];
             }
-            printArr(message.data);
             newPacket.checksum = checksum(newPacket);
             cout << "packet.payload contents " << newPacket.seqnum << "-" << newPacket.acknum << endl;
             printArr(newPacket.payload);
             tolayer3(0, newPacket);
-            starttimer(0, increment, newPacket.payload);
+            starttimer(0, TIMEOUT, newPacket.payload);
             FSM = 1;
         }
-    }else if(FSM ==0){
+    }else if(FSM ==1){
         buffer.push(message);
         cout << "adding message to buffer";
         printArr(message.data);
@@ -108,7 +106,7 @@ void A_output(msg message) {
 void A_input(pkt packet) {
     struct msg newMsg;
     if((packet.acknum == 1 && seqCurr%2 == 1) || (packet.acknum == 0 && seqCurr%2 == 0)){
-        cout << " successfully received ackNum" << endl;
+        cout << " successfully received ackNum: " << packet.acknum << endl;
         seqCurr +=1;
         FSM =0;
         stoptimer(0, packet.payload);
@@ -130,7 +128,7 @@ void A_timerinterrupt(void *adata) {
     }
     pckt.checksum = checksum(pckt);
     tolayer3(0, pckt);
-    starttimer(0, increment, pckt.payload);
+    starttimer(0, TIMEOUT, pckt.payload);
 }
 
 /* the following routine will be called once (only) before any other */
@@ -143,9 +141,9 @@ void A_init() {
 void B_input(pkt packet) {
     struct msg newMsg;
     struct pkt ackPkt;
-
+    
     if(checksum(packet) != packet.checksum){
-        cout << "checksum for message doesn't match";
+        cout << "checksum for message doesn't match" << endl;
     }else if(expSeqNum % 2 == packet.seqnum){
         for(int i = 0; i < sizeof(packet.payload); i++){
             newMsg.data[i] = packet.payload[i];

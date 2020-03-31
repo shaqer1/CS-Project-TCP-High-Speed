@@ -1,0 +1,275 @@
+
+EVENT time: 18.705740,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum0
+AOutput base0
+AOutput win size8
+A sending packet: aaaaaaaa
+
+EVENT time: 24.170835,  type: 2, fromlayer3  entity: 1
+B received packet: aaaaaaaa
+          TOLAYER3: packet being corrupted
+
+EVENT time: 29.402449,  type: 2, fromlayer3  entity: 0
+Corrupted Packet, waiting
+
+EVENT time: 35.124840,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum1
+AOutput base0
+AOutput win size8
+A sending packet: bbbbbbbb
+          TOLAYER3: packet being lost.
+
+EVENT time: 37.680447,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum2
+AOutput base0
+AOutput win size8
+A sending packet: cccccccc
+          TOLAYER3: packet being corrupted
+
+EVENT time: 42.147713,  type: 2, fromlayer3  entity: 1
+B received packet: Zccccccc
+
+EVENT time: 43.705742,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+
+EVENT time: 46.394402,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum3
+AOutput base0
+AOutput win size8
+A sending packet: dddddddd
+
+EVENT time: 53.134167,  type: 2, fromlayer3  entity: 1
+B received packet: bbbbbbbb
+
+EVENT time: 55.500507,  type: 2, fromlayer3  entity: 0
+Warning: unable to cancel your timer. It wasn't running.
+
+EVENT time: 57.571404,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum4
+AOutput base2
+AOutput win size8
+A sending packet: eeeeeeee
+          TOLAYER3: packet being lost.
+
+EVENT time: 60.597080,  type: 2, fromlayer3  entity: 1
+B received packet: cccccccc
+          TOLAYER3: packet being lost.
+
+EVENT time: 63.327320,  type: 2, fromlayer3  entity: 1
+B received packet: dddddddd
+
+EVENT time: 67.742073,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum5
+AOutput base2
+AOutput win size8
+A sending packet: ffffffff
+          TOLAYER3: packet being lost.
+
+EVENT time: 68.705742,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being lost.
+
+EVENT time: 69.576332,  type: 2, fromlayer3  entity: 0
+
+EVENT time: 74.543709,  type: 2, fromlayer3  entity: 1
+B received packet: Zccccccc
+
+EVENT time: 76.418900,  type: 2, fromlayer3  entity: 1
+B received packet: dddddddd
+
+EVENT time: 77.725288,  type: 2, fromlayer3  entity: 1
+B received packet: ffffffff
+
+EVENT time: 81.523926,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum6
+AOutput base4
+AOutput win size8
+A sending packet: gggggggg
+          TOLAYER3: packet being corrupted
+
+EVENT time: 82.744209,  type: 2, fromlayer3  entity: 1
+B received packet: gggggggg
+
+EVENT time: 91.021927,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum7
+AOutput base4
+AOutput win size8
+A sending packet: hhhhhhhh
+          TOLAYER3: packet being lost.
+
+EVENT time: 93.705742,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+
+EVENT time: 94.576332,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being lost.
+
+EVENT time: 98.525024,  type: 2, fromlayer3  entity: 1
+B received packet: ffffffff
+
+EVENT time: 102.688446,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum8
+AOutput base4
+AOutput win size8
+A sending packet: iiiiiiii
+          TOLAYER3: packet being lost.
+
+EVENT time: 104.862602,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum9
+AOutput base4
+AOutput win size8
+A sending packet: jjjjjjjj
+          TOLAYER3: packet being lost.
+
+EVENT time: 107.921104,  type: 2, fromlayer3  entity: 1
+B received packet: gggggggg
+
+EVENT time: 109.078751,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum10
+AOutput base4
+AOutput win size8
+A sending packet: kkkkkkkk
+
+EVENT time: 111.501602,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum11
+AOutput base4
+AOutput win size8
+A sending packet: llllllll
+
+EVENT time: 115.983917,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 117.153870,  type: 2, fromlayer3  entity: 1
+B received packet: hhhhhhhh
+
+EVENT time: 118.705742,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+
+EVENT time: 119.576332,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+
+EVENT time: 125.923035,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 126.545288,  type: 2, fromlayer3  entity: 1
+B received packet: ffffffff
+
+EVENT time: 128.658020,  type: 2, fromlayer3  entity: 1
+B received packet: kkkkkkkk
+
+EVENT time: 134.890457,  type: 2, fromlayer3  entity: 1
+B received packet: llllllll
+
+EVENT time: 140.874557,  type: 2, fromlayer3  entity: 1
+B received packet: ffffffff
+
+EVENT time: 143.705750,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being lost.
+
+EVENT time: 144.576324,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+
+EVENT time: 144.611420,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 148.736496,  type: 2, fromlayer3  entity: 1
+B received packet: gggggggg
+
+EVENT time: 156.694351,  type: 2, fromlayer3  entity: 1
+B received packet: iiiiiiii
+
+EVENT time: 161.086807,  type: 2, fromlayer3  entity: 1
+B received packet: jjjjjjjj
+
+EVENT time: 163.165344,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 166.751831,  type: 2, fromlayer3  entity: 1
+B received packet: kkkkkkkk
+
+EVENT time: 168.705750,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being lost.
+
+EVENT time: 169.576324,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being corrupted
+
+EVENT time: 173.448669,  type: 2, fromlayer3  entity: 1
+B received packet: Zlllllll
+
+EVENT time: 175.474747,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 177.304459,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 180.078018,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base4
+AOutput win size8
+AOutput: data refused
+
+EVENT time: 182.936844,  type: 2, fromlayer3  entity: 1
+B received packet: eeeeeeee
+          TOLAYER3: packet being lost.
+
+EVENT time: 185.442062,  type: 2, fromlayer3  entity: 1
+B received packet: ffffffff
+
+EVENT time: 187.760681,  type: 2, fromlayer3  entity: 0
+
+EVENT time: 191.701340,  type: 2, fromlayer3  entity: 1
+B received packet: gggggggg
+
+EVENT time: 192.776154,  type: 2, fromlayer3  entity: 0
+
+EVENT time: 193.705750,  type: 0, timerinterrupt   entity: 0
+          TOLAYER3: packet being lost.
+          TOLAYER3: packet being corrupted
+          TOLAYER3: packet being lost.
+
+EVENT time: 197.602295,  type: 2, fromlayer3  entity: 1
+B received packet: Zjjjjjjj
+
+EVENT time: 197.846420,  type: 1, fromlayer5  entity: 0
+A_out sending data from layer5AOutput Next SeqNum12
+AOutput base7
+AOutput win size8
+A sending packet: mmmmmmmm
+          TOLAYER3: packet being corrupted
+
+EVENT time: 199.952881,  type: 1, fromlayer5  entity: 0
