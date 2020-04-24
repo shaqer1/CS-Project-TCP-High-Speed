@@ -56,54 +56,17 @@ void printArr(char * array){
 
 /* called from layer 5, passed the data to be sent to other side */
 void A_output(msg message) {
-    cout << "A_out sending data from layer5" << endl;
-    struct pkt newPacket;
-    for(int i =0; i<20; i++){
-        newPacket.payload[i] = message.data[i];
-    }
-    buffer.push_back(newPacket);
-    cout << "AOutput Next SeqNum" << nxtSeqNum << endl;
-    cout << "AOutput base" << base << endl;
-    if(nxtSeqNum < base + WINDOWSIZE){
-        buffer[nxtSeqNum].seqnum = nxtSeqNum;
-        buffer[nxtSeqNum].acknum = 0;
-        buffer[nxtSeqNum].checksum = checksum(buffer[nxtSeqNum]);
-        cout << "A sending packet: ";
-        printArr(buffer[nxtSeqNum].payload);
-        tolayer3(0,buffer[nxtSeqNum]);
-        if(base == nxtSeqNum){
-            starttimer(0, TIMEOUT, (void *) 1);
-        }
-        nxtSeqNum++;
-    }else {
-        cout << "AOutput: data refused" << endl;
-    }
+
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(pkt packet) {
-    if(checksum(packet) == packet.checksum){
-        cout << "Received ACK for pkt" << packet.seqnum << endl;
-        base = packet.acknum + 1;
-        if (base == nxtSeqNum){
-            stoptimer(0, (void *) 1);
-        }else {
-            stoptimer(0, (void *) 1);
-            starttimer(0, TIMEOUT, (void *) 1);
-        }
-    } else {
-        cout << "Corrupted Ack Packet, waiting" << endl;
-    }
+    
 }
 
 /* called when A's timer goes off */
 void A_timerinterrupt(void *adata) {
-    starttimer(0, TIMEOUT, adata);
-    cout << "Ain Timer interrupt" << endl;
-    for(int i =base; i < nxtSeqNum; i++){
-        tolayer3(0, buffer[i]);
-    }
-    cout << "Sent nxtSeqNum - Base pkts " << base << "-" << nxtSeqNum << " " << nxtSeqNum - base << endl;
+   
 }
 
 /* the following routine will be called once (only) before any other */
@@ -113,29 +76,11 @@ void A_init() {
 
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(pkt packet) {
-    cout << "B received packet: ";
-    printArr(packet.payload);
-    struct pkt newAckPkt;
-    if(checksum(packet) == packet.checksum && packet.seqnum == expSeqNum){
-        cout << "sending ack num for pkt: " << packet.seqnum << endl;
-        char message[MESSAGE_LEN];
-        for(int i =0; i < MESSAGE_LEN; i++){
-            message[i] = packet.payload[i];
-        }
-        tolayer5(1, message);
-        newAckPkt.acknum = expSeqNum;
-        newAckPkt.seqnum = expSeqNum;
-        memset(newAckPkt.payload, 0, MESSAGE_LEN);
-        newAckPkt.checksum = checksum(newAckPkt);
-        tolayer3(1, newAckPkt);
-        expSeqNum++;
-    }else{
-        cout << "corrupted message" << endl;
-    }
+    
 }
 
 /* the following rouytine will be called once (only) before any other */
 /* entity B routines are called. You can use it to do any initialization */
 void B_init() {
-    expSeqNum = 0;
+    
 }

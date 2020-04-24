@@ -29,7 +29,7 @@ implementing selective repeat
 // set to 0, we only consider unidirectional cases here (from A to B)
 #define BIDIRECTIONAL 0
 // the amount of time that will pass before the timer interrupts
-#define TIMEOUT 25
+#define TIMEOUT 20
 // used to limit the number of unacknowledged packets
 // note that some of the packets in the window will already receive the ACKs in SR algorithm
 #define WINDOWSIZE 8
@@ -75,7 +75,6 @@ void stoptimer(int AorB, void *adata);
 void starttimer(int AorB, float increment, void *adata);
 void tolayer3(int AorB, pkt packet);
 void tolayer5(int AorB, char *datasent);
-float getSimTime();
 
 
 #endif // _PROG2_H_

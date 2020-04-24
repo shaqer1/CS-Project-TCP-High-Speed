@@ -412,5 +412,3 @@ void tolayer5(int AorB, char *datasent) {
 		printf("\n");
 	}
 }
-
-float getSimTime(){ return time;}

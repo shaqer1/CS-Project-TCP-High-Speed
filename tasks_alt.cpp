@@ -78,7 +78,7 @@ void A_output(msg message) {
             starttimer(0, TIMEOUT, newPacket.payload);
             tolayer3(0, newPacket);
             FSM = 1;
-            cout << "sending message:";
+            cout << "sending message: ";
             printArr(newPacket.payload);
         }else {
             cout << "Buffer is empty" << endl;
@@ -96,7 +96,7 @@ void A_output(msg message) {
         }
     }else if(FSM ==1){
         buffer.push(message);
-        cout << "adding message to buffer";
+        cout << "adding message to buffer: ";
         printArr(message.data);
     }
 
@@ -111,7 +111,7 @@ void A_input(pkt packet) {
         FSM =0;
         stoptimer(0, packet.payload);
     } else{
-        cout << "discarding message" << endl;
+        cout << "Ainput: discarding message" << endl;
     }
 }
 
@@ -119,7 +119,7 @@ void A_input(pkt packet) {
 void A_timerinterrupt(void *adata) {
     cout << "Timed out, resending last msg"<< endl;
     printArr(lastMsg.data);
-    cout << "seq Number" << seqCurr << endl;
+    cout << "seq Number: " << seqCurr << endl;
     struct pkt pckt;
     pckt.seqnum = seqCurr %2;
     pckt.acknum = 0;
@@ -143,12 +143,12 @@ void B_input(pkt packet) {
     struct pkt ackPkt;
     
     if(checksum(packet) != packet.checksum){
-        cout << "checksum for message doesn't match" << endl;
+        cout << "BInput: checksum for message doesn't match" << endl;
     }else if(expSeqNum % 2 == packet.seqnum){
         for(int i = 0; i < sizeof(packet.payload); i++){
             newMsg.data[i] = packet.payload[i];
         }
-        cout << "Sending message:" << endl;
+        cout << "Sending message: " << endl;
         printArr(newMsg.data);
         tolayer5(1, newMsg.data);
         expSeqNum++;
@@ -162,8 +162,8 @@ void B_input(pkt packet) {
         tolayer3(1, ackPkt);
     }else {
         cout << "Duplicate Packet! Ignoring pckt" << endl;
-        cout << expSeqNum << endl;
-        cout << packet.seqnum << endl;
+        cout << "expeced seq num: " << expSeqNum << endl;
+        cout << "packet seq num: " << packet.seqnum << endl;
         ackPkt.seqnum = packet.seqnum;
         ackPkt.acknum = packet.seqnum;
         memset(ackPkt.payload, 0, MESSAGE_LEN);

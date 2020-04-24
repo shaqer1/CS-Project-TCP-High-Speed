@@ -78,10 +78,8 @@ void A_output(msg message) {
         printArr(bufferA[nxtSeqNum].packet.payload);
         tolayer3(0, bufferA[nxtSeqNum].packet);
         bufferA[nxtSeqNum].ack = 0;
-        bufferA[nxtSeqNum].timestamp = getSimTime();
-        if(senderBase == nxtSeqNum){
-            starttimer(0, TIMEOUT, bufferA[nxtSeqNum].packet.payload);
-        }
+        //bufferA[nxtSeqNum].timestamp = getSimTime();
+        starttimer(0, TIMEOUT, (void*)nxtSeqNum);
         nxtSeqNum++;
     }
 }
@@ -96,35 +94,19 @@ void A_input(pkt packet) {
         }
         cout << "Sender base: " << senderBase << endl;
         cout << "Next seq num: " << nxtSeqNum << endl;
-        if(senderBase == nxtSeqNum){
-            cout << "stopping timer: "<< endl;
-            stoptimer(0, bufferA[packet.acknum].packet.payload);
-        } else {
-            stoptimer(0, bufferA[packet.acknum].packet.payload);
-            starttimer(0, bufferA[senderBase].timestamp + TIMEOUT - getSimTime(), bufferA[senderBase].packet.payload);
-        }
+        cout << "stopping timer: "<< endl;
+        stoptimer(0, (void*) packet.acknum/*bufferA[packet.acknum].packet.payload*/);
     }else {
         cout << "A recieved corrupt ACK" << endl;
     }
 }
 
-void earliestPacketUnAck() {
-    float leastTime = bufferA[nxtSeqNum-1].timestamp;
-    for(int i = 0; i< WINDOWSIZE+senderBase; i++){
-        if(bufferA[i].ack ==0 && bufferA[i].timestamp != 0 && bufferA[i].timestamp < leastTime){
-            leastTime = bufferA[i].timestamp;
-            earlistSendUnackedIndex = i;
-        }
-    }
-}
-
 /* called when A's timer goes off */
 void A_timerinterrupt(void *adata) {
-    cout << "A timeout sending earliest unAck'd pkt" << endl;
-    earliestPacketUnAck();
-    tolayer3(0, bufferA[earlistSendUnackedIndex].packet);
-    cout << "packet num: " << earlistSendUnackedIndex << ", sendtime: " << bufferA[earlistSendUnackedIndex].timestamp << endl;
-    starttimer(0, TIMEOUT, bufferA[earlistSendUnackedIndex].packet.payload);
+    cout << "A timeout sending unAck'd pkt" << endl;
+    tolayer3(0, bufferA[*((int *) &adata)].packet);
+    cout << "packet num: " << *((int *) &adata) << ", sendtime: " << bufferA[*((int *) &adata)].timestamp << endl;
+    starttimer(0, TIMEOUT, adata);
 }
 
 /* the following routine will be called once (only) before any other */
@@ -139,7 +121,7 @@ void B_input(pkt packet) {
     struct pkt newPkt;
     if(packet.checksum == checksum(packet)){
         if(bufferB[packet.seqnum].ack != 1){
-            cout << "sending ack message" << endl;
+            cout << "Sending ack message seq: " << packet.seqnum << endl;
             newPkt.acknum = packet.seqnum;
             newPkt.seqnum = 0;
             memset(newPkt.payload, 0, 20);
@@ -160,7 +142,7 @@ void B_input(pkt packet) {
             }
         } else {
             cout << "Duplicate message" << endl;
-            cout << "Sending ack message" << endl;
+            cout << "Sending ack message seq: " << packet.seqnum << endl;
             newPkt.acknum = packet.seqnum;
             newPkt.seqnum = 0;
             memset(newPkt.payload, 0, 20);
