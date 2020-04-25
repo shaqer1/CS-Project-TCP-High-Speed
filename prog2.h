@@ -29,13 +29,13 @@ implementing selective repeat
 // set to 0, we only consider unidirectional cases here (from A to B)
 #define BIDIRECTIONAL 0
 // the amount of time that will pass before the timer interrupts
-#define TIMEOUT 20
+#define TIMEOUT 30
 // used to limit the number of unacknowledged packets
 // note that some of the packets in the window will already receive the ACKs in SR algorithm
 #define WINDOWSIZE 8
 // used to limit the number of packets in the buffer
 // further packets will be dropped 
-#define BUFFERSIZE 50
+#define BUFFERSIZE 150
 
 /* a "msg" is the data unit passed from layer 5 (teachers code) to layer  */
 /* 4 (students' code).  It contains the data (characters) to be delivered */

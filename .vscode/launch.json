@@ -5,48 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "gcc debug tasks_alt",
+            "name": "gcc debug tasks_tcp",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/tasks_alt",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                }
-            ],
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "gcc debug tasks_sr",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/tasks_sr",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                }
-            ],
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "gcc debug tasks_gbn",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/tasks_gbn",
+            "program": "${workspaceFolder}/tasks_tcp",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

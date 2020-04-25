@@ -101,9 +101,9 @@ int main() {
 			printf(" entity: %d\n", eventptr->eventity);
 		}
 		time = eventptr->evtime;        /* update time to next event time */
-		if (nsim == nsimmax)
+		if (nsim == nsimmax && eventptr == NULL)
 			break;                        /* all done with simulation */
-		if (eventptr->evtype == FROM_LAYER5) {
+		if (eventptr->evtype == FROM_LAYER5 && nsim < nsimmax) {
 			generate_next_arrival();   /* set up future arrival */
 			/* fill in msg to give with string of same letter */
 			j = nsim % 26;
