@@ -103,21 +103,23 @@ int main() {
 		time = eventptr->evtime;        /* update time to next event time */
 		if (nsim == nsimmax && eventptr == NULL)
 			break;                        /* all done with simulation */
-		if (eventptr->evtype == FROM_LAYER5 && nsim < nsimmax) {
-			generate_next_arrival();   /* set up future arrival */
-			/* fill in msg to give with string of same letter */
-			j = nsim % 26;
-			for (i = 0; i < MESSAGE_LEN; i++)
-				msg2give.data[i] = 97 + j;
-			if (TRACE > 2) {
-				printf("          MAINLOOP: data given to student: ");
+		if (eventptr->evtype == FROM_LAYER5) {
+			if(nsim < nsimmax){
+				generate_next_arrival();   /* set up future arrival */
+				/* fill in msg to give with string of same letter */
+				j = nsim % 26;
 				for (i = 0; i < MESSAGE_LEN; i++)
-					printf("%c", msg2give.data[i]);
-				printf("\n");
+					msg2give.data[i] = 97 + j;
+				if (TRACE > 2) {
+					printf("          MAINLOOP: data given to student: ");
+					for (i = 0; i < MESSAGE_LEN; i++)
+						printf("%c", msg2give.data[i]);
+					printf("\n");
+				}
+				nsim++;
+				if (eventptr->eventity == A)
+					A_output(msg2give);
 			}
-			nsim++;
-			if (eventptr->eventity == A)
-				A_output(msg2give);
 		}
 		else if (eventptr->evtype == FROM_LAYER3) {
 			pkt2give.seqnum = eventptr->pktptr->seqnum;

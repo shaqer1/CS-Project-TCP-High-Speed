@@ -43,6 +43,7 @@ int ssthresh;
 int dupAckCount;
 int state;
 int nxtSeqNum;
+int expRcvPkt;
 
 struct TCPRcvPkt {
     pkt packet;
@@ -106,8 +107,8 @@ void A_output(msg message) {
 void A_input(pkt packet) {
     if(checksum(packet) == packet.checksum){
         if(packet.acknum - 1 < sendBase) {//dup ack 
-            cout << "Duplicate ack: " << packet.acknum << endl;
             dupAckCount++;
+            cout << "Duplicate ack: " << packet.acknum << " dupAckCount: " << dupAckCount << endl;
             if(dupAckCount == 3){
                 if(state == SLOWSTART){
                     counterSS = 0;
@@ -126,6 +127,9 @@ void A_input(pkt packet) {
                 printArr(sendBuffer[seqNum].payload);
                 tolayer3(0,sendBuffer[seqNum]);
                 starttimer(0, TIMEOUT, (void*)seqNum);
+            }else if (state == FASTRECOV){
+                cwnd = cwnd + 1;
+                sendFromCwnd();
             }
         } else { // new ack
             cout << "New Ack'd seq: " << packet.acknum << endl;
@@ -196,6 +200,28 @@ void A_init() {// TODO pass in
     nxtSeqNum = 0;
 }
 
+void insert(TCPRcvPkt pkt){
+    if(0 == rcvBuffer.size()){
+        rcvBuffer.push_back(pkt);
+        return;
+    } 
+    for(int i = rcvBuffer.size()-1; i >= 0; i--){
+        if(rcvBuffer[i].packet.seqnum < pkt.packet.seqnum){
+            rcvBuffer.insert(rcvBuffer.begin()+i+1, pkt);
+            return;
+        }
+    }
+}
+
+int checkDuplicateRcv(int seqNum){
+    for(int i = 0; i < rcvBuffer.size(); i++){
+        if(rcvBuffer[i].packet.seqnum == seqNum){
+            return true;
+        }
+    }
+    return false;
+}
+
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(pkt packet) {
     //buffer out of order and send most inorder pkt ack
@@ -203,27 +229,38 @@ void B_input(pkt packet) {
     printArr(packet.payload);
     struct pkt newAckPkt;
     if(checksum(packet) == packet.checksum){
-        if(rcvBase <= packet.seqnum){
+        if(!checkDuplicateRcv(packet.seqnum)){// check if duplicate
             //deliver all in sequence
             struct TCPRcvPkt rcvPkt;
             rcvPkt.packet = packet;
             rcvPkt.ack = 1;
-            rcvBuffer.push_back(rcvPkt);//buffer pkt
-            while(rcvBuffer[rcvBase].ack == 1){// if in sequence deliver
+            insert(rcvPkt);//buffer pkt
+            expRcvPkt = rcvBase;
+            // int assign = (rcvBuffer[rcvBase].packet.seqnum == lastRcvPkt)?true:false;
+            int assign = false;
+            while(rcvBuffer[rcvBase].ack == 1 && packet.seqnum == expRcvPkt && rcvBase == rcvBuffer[rcvBase].packet.seqnum){// if in sequence deliver, might not need 2nd condition
                 cout << "Delivering message: ";
                 printArr(rcvBuffer[rcvBase].packet.payload);
                 tolayer5(1, rcvBuffer[rcvBase].packet.payload);
                 rcvBase++;
+                assign = true;
             }
             //send ack of rcvBase
-            cout << "Sending ack message seq: " << rcvBase << endl;
-            newAckPkt.acknum = rcvBase;
+            expRcvPkt = (assign)?rcvBase:expRcvPkt;
+            cout << "Sending ack message seq: " << expRcvPkt << endl;
+            newAckPkt.acknum = expRcvPkt;
             newAckPkt.seqnum = 0;
             memset(newAckPkt.payload, 0, MESSAGE_LEN);
             newAckPkt.checksum = checksum(newAckPkt);
             tolayer3(1,newAckPkt);
         } else {
             cout << "B got Duplicate message: " << packet.seqnum << endl;
+            cout << "Sending ack message seq: " << expRcvPkt << endl;
+            newAckPkt.acknum = expRcvPkt;
+            newAckPkt.seqnum = 0;
+            memset(newAckPkt.payload, 0, MESSAGE_LEN);
+            newAckPkt.checksum = checksum(newAckPkt);
+            tolayer3(1,newAckPkt);
         }
     } else{
         cout << "corrupted message" << endl;
@@ -234,5 +271,5 @@ void B_input(pkt packet) {
 /* the following rouytine will be called once (only) before any other */
 /* entity B routines are called. You can use it to do any initialization */
 void B_init() {
-    rcvBase = 0;
+    rcvBase = expRcvPkt = 0;
 }
