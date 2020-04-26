@@ -71,15 +71,28 @@ void init();
 void generate_next_arrival();
 void insertevent(event *p);
 
-int main() {
+int main(int argc, char *argv[]) {
 	event *eventptr;
 	msg  msg2give;
 	pkt  pkt2give;
 
 	int i, j;
 
+	int cwnd = 0;
+	int ssthresh = 8;
+	if (argc > 2){
+		for(int i = 1; i < argc; i++){
+			if(strcmp(argv[i], "cwnd") == 0){
+				cwnd = atoi(argv[i+1]);
+			}
+			if(strcmp(argv[i], "ssthresh") == 0){
+				ssthresh = atoi(argv[i+1]);
+			}
+		}
+	}
+
 	init();
-	A_init();
+	A_init(ssthresh, cwnd);
 	B_init();
 
 	while (1) {
