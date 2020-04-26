@@ -116,6 +116,7 @@ void A_input(pkt packet) {
                 cout << "3 Duplicate Ack occurred: " << packet.acknum << endl;
                 state = FASTRECOV;
                 ssthresh = cwnd/2;
+                dupAckCount = 0;
                 cwnd = ssthresh + 3;
                 //send unack pkt
                 int seqNum = packet.acknum;
@@ -190,10 +191,10 @@ void A_timerinterrupt(void *adata) {
 
 /* the following routine will be called once (only) before any other */
 /* entity A routines are called. You can use it to do any initialization */
-void A_init(int ssthresh, int cwnd) {
+void A_init(int ssth, int cw) {
     counterSS = 0;
     cwnd = pow(2, counterSS++);
-    ssthresh = 8; //8 byte segments
+    ssthresh = ssth; //8 byte segments
     dupAckCount = 0;
     state = SLOWSTART;
     sendBase = 0;
