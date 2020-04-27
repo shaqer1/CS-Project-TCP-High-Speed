@@ -393,7 +393,7 @@ void tolayer3(int AorB, pkt packet) {
 	 currently in the medium on their way to the destination */
 	lastime = time;
 	/* for (q=evlist; q!=NULL && q->next!=NULL; q = q->next) */
-	for (q = evlist; q != NULL; q = q->next)
+	for (q = evlist; q != NULL; q = q->next) //TODO for high speed
 		if ((q->evtype == FROM_LAYER3  && q->eventity == evptr->eventity))
 			lastime = q->evtime;
 	evptr->evtime = lastime + 1 + 9 * jimsrand();

@@ -140,6 +140,9 @@ void A_input(pkt packet) {
             }
             sendBase = packet.acknum;
             dupAckCount = 0;
+            if(state == FASTRECOV){
+                state = CONGAVOID;
+            }
             //change cwnd
             switch (state){
                 case SLOWSTART:
