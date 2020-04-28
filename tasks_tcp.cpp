@@ -1,10 +1,13 @@
+#include "prog2.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <vector>
 #include <stdlib.h>
-#include "prog2.h"
 #include <iostream>
 #include <math.h>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -44,6 +47,7 @@ int dupAckCount;
 int state;
 int nxtSeqNum;
 int expRcvPkt;
+string CWNDFile("cwnd.csv");
 
 struct TCPRcvPkt {
     pkt packet;
@@ -103,8 +107,16 @@ void A_output(msg message) {
     cout << "cwnd, nxtSeqNum, sendBase, State: " << cwnd << ", " << nxtSeqNum << ", " << sendBase << ", " << state << endl;
 }
 
+void writeToFile(unsigned long v, int state, string fd){
+    ofstream outf;
+    outf.open(fd, fstream::in | fstream::out | fstream::app);
+    outf << v << "," << state <<"\n";
+    outf.close();
+}
+
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(pkt packet) {
+    int changed = 0;
     if(checksum(packet) == packet.checksum){
         if(packet.acknum - 1 < sendBase) {//dup ack 
             dupAckCount++;
@@ -115,6 +127,7 @@ void A_input(pkt packet) {
                 }
                 cout << "3 Duplicate Ack occurred: " << packet.acknum << endl;
                 state = FASTRECOV;
+                changed = 1;
                 ssthresh = cwnd/2;
                 dupAckCount = 0;
                 cwnd = ssthresh + 3;
@@ -130,10 +143,12 @@ void A_input(pkt packet) {
                 starttimer(0, TIMEOUT, (void*)seqNum);
             }else if (state == FASTRECOV){
                 cwnd = cwnd + 1;
+                changed = 1;
                 sendFromCwnd();
             }
         } else { // new ack
             cout << "New Ack'd seq: " << packet.acknum << endl;
+            changed = 1;
             for(int i = sendBase; i < packet.acknum; i++){
                 cout << "stopping timer for: " << i << endl;
                 stoptimer(0, (void*)  i);
@@ -157,7 +172,7 @@ void A_input(pkt packet) {
                     break;
                 case FASTRECOV:
                     cwnd = ssthresh;
-                    break;                
+                    break;
             }
             //if not fast recovery transmit else state = congavd
             if(state == FASTRECOV){
@@ -169,6 +184,8 @@ void A_input(pkt packet) {
     } else {
         cout << "Corrupted Ack Packet, waiting" << endl;
     }
+    if(changed)
+        writeToFile(cwnd, state, CWNDFile);
     cout << "cwnd, nxtSeqNum, sendBase, State: " << cwnd << ", " << nxtSeqNum << ", " << sendBase << ", " << state << endl;
 }
 
@@ -178,8 +195,9 @@ void A_timerinterrupt(void *adata) {
     cout << "A timeout occurred on: " << seqNum << endl;
     //if fast recovery or CONAVD do SLOWSTART for all really
     state = SLOWSTART;
-    ssthresh = cwnd/2;
+    ssthresh = (cwnd > 1)?cwnd/2:1;
     cwnd = 1;
+    counterSS = 1;
     dupAckCount = 0;
     //trnsmit timeout package ack
     sendBuffer[seqNum].seqnum = seqNum;
@@ -189,6 +207,7 @@ void A_timerinterrupt(void *adata) {
     printArr(sendBuffer[seqNum].payload);
     tolayer3(0,sendBuffer[seqNum]);
     starttimer(0, TIMEOUT, (void*)seqNum);
+    writeToFile(cwnd, state, CWNDFile);
     cout << "cwnd, nxtSeqNum, sendBase, State: " << cwnd << ", " << nxtSeqNum << ", " << sendBase << ", " << state << endl;
 }
 

@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	int i, j;
 
 	int cwnd = 0;
-	int ssthresh = 8;
+	int ssthresh = 24;
 	if (argc > 2){
 		for(int i = 1; i < argc; i++){
 			if(strcmp(argv[i], "cwnd") == 0){
@@ -174,10 +174,11 @@ void init() {
 	fprintf(stderr, "-----  Stop and Wait Network Simulator Version 1.1 -------- \n\n");
 	fprintf(stderr, "Enter the number of messages to simulate: ");
 	scanf("%d", &nsimmax);
-	fprintf(stderr, "Enter  packet loss probability [enter 0.0 for no loss]:");
+	fprintf(stderr, "Enter  initial packet loss probability (increases linearly as more packets in flight) [enter 0.0 for no loss]:");
 	scanf("%f", &lossprob);
-	fprintf(stderr, "Enter packet corruption probability [0.0 for no corruption]:");
-	scanf("%f", &corruptprob);
+	// fprintf(stderr, "Enter packet corruption probability [0.0 for no corruption]:");
+	// scanf("%f", &corruptprob);
+	corruptprob = 0.0;
 	fprintf(stderr, "Enter average time between messages from sender's layer5 [ > 0.0]:");
 	scanf("%f", &lambda);
 	fprintf(stderr, "Enter TRACE:");
@@ -396,7 +397,8 @@ void tolayer3(int AorB, pkt packet) {
 	for (q = evlist; q != NULL; q = q->next) //TODO for high speed
 		if ((q->evtype == FROM_LAYER3  && q->eventity == evptr->eventity))
 			lastime = q->evtime;
-	evptr->evtime = lastime + 1 + 9 * jimsrand();
+	float rand = jimsrand();
+	evptr->evtime = lastime + 1 + 9 * rand;
 
 
 
