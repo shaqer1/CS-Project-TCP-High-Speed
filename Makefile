@@ -19,17 +19,23 @@ CFLAGS  = -g -Wall
 # you can name this target entry anything, but "default" or "all"
 # are the most commonly used names by convention
 #
-default: prog2.o tasks_tcp
+default: prog2.o tasks_tcp tasks_tcp_HS
 
 # To create the executable file count we need the object files
 
 tasks_tcp: tasks_tcp.o prog2.o
 	$(CC) $(CFLAGS) tasks_tcp.o prog2.o -o tasks_tcp 
 
+tasks_tcp_HS: tasks_tcp_HS.o prog2.o
+	$(CC) $(CFLAGS) tasks_tcp_HS.o prog2.o -o tasks_tcp_HS
+
 # To create the object files *.o, we need the source files
 
 tasks_tcp.o:  tasks_tcp.cpp prog2.h
 	$(CC) $(CFLAGS) -c tasks_tcp.cpp
+
+tasks_tcp_HS.o:  tasks_tcp_HIGHSPEED.cpp prog2.h
+	$(CC) $(CFLAGS) -c tasks_tcp_HIGHSPEED.cpp
 
 prog2.o: prog2.cpp prog2.h 
 	$(CC) $(CFLAGS) -c prog2.cpp
@@ -39,4 +45,4 @@ prog2.o: prog2.cpp prog2.h
 # files and *~ backup files:
 #
 clean: 
-	$(RM) tasks_tcp *.o *~
+	$(RM) tasks_tcp tasks_tcp_HS *.o *~
