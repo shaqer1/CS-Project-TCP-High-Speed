@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <math.h>
+
 /* ******************************************************************
 ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR:
 
@@ -66,6 +68,7 @@ float lambda;              /* arrival rate of messages from layer 5 */
 int ntolayer3;           /* number sent into layer 3 */
 int nlost;               /* number lost in media */
 int ncorrupt;              /* number corrupted by media*/
+int nInFlight = 0;           /* number in network flowing currently */
 
 void init();
 void generate_next_arrival();
@@ -140,6 +143,7 @@ int main(int argc, char *argv[]) {
 			pkt2give.checksum = eventptr->pktptr->checksum;
 			for (i = 0; i < MESSAGE_LEN; i++)
 				pkt2give.payload[i] = eventptr->pktptr->payload[i];
+			nInFlight--;
 			if (eventptr->eventity == A)      /* deliver packet by calling */
 				A_input(pkt2give);            /* appropriate entity */
 			else
@@ -351,10 +355,13 @@ void tolayer3(int AorB, pkt packet) {
 	int i;
 
 	ntolayer3++;
+	nInFlight++;
 
+	float probability = (-1*pow(1+lossprob,-1*nInFlight)) +1; // function to make congestion losses more realistic. as nInflight increase probability gets closer to 1
 	/* simulate losses: */
-	if (jimsrand() < lossprob) {
+	if (jimsrand() < probability) {
 		nlost++;
+		nInFlight--;
 		if (TRACE > 0)
 			printf("          TOLAYER3: packet being lost.\n");
 		if (TRACE > 2) {

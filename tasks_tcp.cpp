@@ -221,6 +221,11 @@ void A_init(int ssth, int cw) {
     state = SLOWSTART;
     sendBase = 0;
     nxtSeqNum = 0;
+    ofstream out;
+    out.open(CWNDFile);
+    out << "";
+    out.close();
+    writeToFile(cwnd, state, CWNDFile);
 }
 
 void insert(TCPRcvPkt pkt){
