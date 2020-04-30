@@ -2,7 +2,8 @@ tasks_alt.cpp
 tasks_gbn.cpp
 tasks_sr.cpp
 tasks_tcp
-tasks_tcp_HS
+highOut
+tasks_tcp_HIGHSPEED
 *.o
 *~
 cwnd.csv.bak

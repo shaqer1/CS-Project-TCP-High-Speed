@@ -81,21 +81,21 @@ int main(int argc, char *argv[]) {
 
 	int i, j;
 
-	int cwnd = 0;
-	int ssthresh = 24;
+	int param1 = 0;
+	int param2 = 24;
 	if (argc > 2){
 		for(int i = 1; i < argc; i++){
-			if(strcmp(argv[i], "cwnd") == 0){
-				cwnd = atoi(argv[i+1]);
+			if(strcmp(argv[i], "cwnd") == 0 || strcmp(argv[i], "highwin") == 0){
+				param1 = atoi(argv[i+1]);
 			}
-			if(strcmp(argv[i], "ssthresh") == 0){
-				ssthresh = atoi(argv[i+1]);
+			if(strcmp(argv[i], "ssthresh") == 0 || strcmp(argv[i], "lowwin") == 0){
+				param2 = atoi(argv[i+1]);
 			}
 		}
 	}
 
 	init();
-	A_init(ssthresh, cwnd);
+	A_init(param1, param2, lossprob);
 	B_init();
 
 	while (1) {
@@ -359,7 +359,7 @@ void tolayer3(int AorB, pkt packet) {
 
 	float probability = (-1*pow(1+lossprob,-1*nInFlight)) +1; // function to make congestion losses more realistic. as nInflight increase probability gets closer to 1
 	/* simulate losses: */
-	if (jimsrand() < probability) {
+	if (jimsrand() < probability) {//TODO make permenant
 		nlost++;
 		nInFlight--;
 		if (TRACE > 0)

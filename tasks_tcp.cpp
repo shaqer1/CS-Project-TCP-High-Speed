@@ -213,7 +213,7 @@ void A_timerinterrupt(void *adata) {
 
 /* the following routine will be called once (only) before any other */
 /* entity A routines are called. You can use it to do any initialization */
-void A_init(int ssth, int cw) {
+void A_init(int cw, int ssth, float loss) {
     counterSS = 0;
     cwnd = pow(2, counterSS++);
     ssthresh = ssth; //8 byte segments

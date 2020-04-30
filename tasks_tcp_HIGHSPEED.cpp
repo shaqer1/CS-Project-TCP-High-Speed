@@ -34,20 +34,27 @@ implementing selective repeat
 
 /********* STUDENTS WRITE THE NEXT SIX ROUTINES *********/
 //states defined
-#define SLOWSTART 0
-#define CONGAVOID 1
-#define FASTRECOV 2
+#define LOW_WIN 0
+#define LOW_HIGH_WIN 1
+#define HIGH_WIN 2
 
-unsigned long cwnd;
-int counterSS;
+float cwnd;
+float alphaW = 0.0;
+float betaW = 0.0;
+int lowWin;
+int highWin;
+float highDec;
+float S;
+float highP;
+float lowP;
+
 int rcvBase;
 int sendBase;
-int ssthresh;
 int dupAckCount;
 int state;
 int nxtSeqNum;
 int expRcvPkt;
-string CWNDFile("cwnd.csv");
+string CWNDFile("cwndHS.csv");
 
 struct TCPRcvPkt {
     pkt packet;
@@ -114,23 +121,57 @@ void writeToFile(unsigned long v, int state, string fd){
     outf.close();
 }
 
+float probW(float cwnd){
+    return pow(((pow(lowP,S)*lowWin)/cwnd) ,1/S);
+}
+
+float calculateCWND(int isLoss){
+    if (cwnd < lowWin){
+        alphaW = cwnd;
+        betaW = 0.5;
+    }else if (cwnd >= lowWin && cwnd <= highWin){
+        betaW = ( (highDec - 0.5)*((log10(cwnd) - log10(lowWin))/(log10(highWin) - log10(lowWin))) ) + 0.5;
+        alphaW = (cwnd*cwnd)*probW(cwnd)*2*(betaW/(2-betaW));
+    }else if (cwnd > highWin){
+        betaW = highDec;
+        alphaW = (highWin*highWin)*highP*2*(betaW/(2-betaW));
+    }
+    
+    if (alphaW < 0 || betaW < 0){
+        printf("--------------------------------PANIC!!!-------------------------\n");
+        printf("----------------------alpha: %.2f, beta: %.2f--------------------\n", alphaW, betaW);
+        exit(1);
+    }
+
+    if (cwnd < lowWin){//set CWND for next transmission
+        state = LOW_WIN;
+    }else if (cwnd >= lowWin && cwnd <= highWin){
+        state = LOW_HIGH_WIN;
+    }else if (cwnd > highWin){
+        state = HIGH_WIN;
+    }
+
+    if(!isLoss){
+        cwnd += alphaW;
+    }else {
+        cwnd = (1-betaW)*cwnd;
+    }
+
+    return (cwnd <1)?1:cwnd;
+}
+
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(pkt packet) {
     int changed = 0;
     if(checksum(packet) == packet.checksum){
-        if(packet.acknum - 1 < sendBase) {//dup ack 
+        if(packet.acknum - 1 < sendBase && sendBase != nxtSeqNum) {//dup ack 
             dupAckCount++;
             cout << "Duplicate ack: " << packet.acknum << " dupAckCount: " << dupAckCount << endl;
             if(dupAckCount == 3){
-                if(state == SLOWSTART){
-                    counterSS = 0;
-                }
                 cout << "3 Duplicate Ack occurred: " << packet.acknum << endl;
-                state = FASTRECOV;
                 changed = 1;
-                ssthresh = cwnd/2;
                 dupAckCount = 0;
-                cwnd = ssthresh + 3;
+                cwnd = calculateCWND(1);
                 //send unack pkt
                 int seqNum = packet.acknum;
                 sendBuffer[seqNum].seqnum = seqNum;
@@ -141,45 +182,24 @@ void A_input(pkt packet) {
                 printArr(sendBuffer[seqNum].payload);
                 tolayer3(0,sendBuffer[seqNum]);
                 starttimer(0, TIMEOUT, (void*)seqNum);
-            }else if (state == FASTRECOV){
-                cwnd = cwnd + 1;
+            }else {
+                cwnd = calculateCWND(0);
                 changed = 1;
                 sendFromCwnd();
             }
         } else { // new ack
             cout << "New Ack'd seq: " << packet.acknum << endl;
-            changed = 1;
             for(int i = sendBase; i < packet.acknum; i++){
                 cout << "stopping timer for: " << i << endl;
                 stoptimer(0, (void*)  i);
             }
             sendBase = packet.acknum;
             dupAckCount = 0;
-            if(state == FASTRECOV){
-                state = CONGAVOID;
-            }
+            changed = 1;
             //change cwnd
-            switch (state){
-                case SLOWSTART:
-                    cwnd = pow(2, counterSS++);
-                    if(cwnd >= ssthresh){
-                        state = CONGAVOID;
-                        counterSS = 0;
-                    }
-                    break;  
-                case CONGAVOID:
-                    cwnd = cwnd + 1;
-                    break;
-                case FASTRECOV:
-                    cwnd = ssthresh;
-                    break;
-            }
-            //if not fast recovery transmit else state = congavd
-            if(state == FASTRECOV){
-                state = CONGAVOID;
-            }else {
-                sendFromCwnd();
-            }
+            cwnd = calculateCWND(0);
+            changed = 1;
+            sendFromCwnd();
         }
     } else {
         cout << "Corrupted Ack Packet, waiting" << endl;
@@ -194,10 +214,7 @@ void A_timerinterrupt(void *adata) {
     int seqNum = *((int *) &adata);
     cout << "A timeout occurred on: " << seqNum << endl;
     //if fast recovery or CONAVD do SLOWSTART for all really
-    state = SLOWSTART;
-    ssthresh = (cwnd > 1)?cwnd/2:1;
-    cwnd = 1;
-    counterSS = 1;
+    cwnd = calculateCWND(1);
     dupAckCount = 0;
     //trnsmit timeout package ack
     sendBuffer[seqNum].seqnum = seqNum;
@@ -213,12 +230,18 @@ void A_timerinterrupt(void *adata) {
 
 /* the following routine will be called once (only) before any other */
 /* entity A routines are called. You can use it to do any initialization */
-void A_init(int ssth, int cw) {
-    counterSS = 0;
-    cwnd = pow(2, counterSS++);
-    ssthresh = ssth; //8 byte segments
+void A_init(int highW, int lowW, float loss) {
+    cwnd = 1;
+    alphaW = 1;
+    betaW = 0.5;
+    lowWin = lowW;
+    highWin = highW;
+    highP = loss*pow(10,-4);
+    lowP = loss;
+    highDec = 0.2;
+    S = log10(highWin/lowWin)/log10(highP/lowP);
     dupAckCount = 0;
-    state = SLOWSTART;
+    state = LOW_WIN;
     sendBase = 0;
     nxtSeqNum = 0;
     ofstream out;

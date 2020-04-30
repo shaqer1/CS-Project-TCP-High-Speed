@@ -63,7 +63,7 @@ typedef struct pkt {
 void A_output(msg message);				// called from layer 5, passed the data to be sent to other side 
 void A_input(pkt packet);				// called from layer 3, when a packet arrives for layer 4
 void A_timerinterrupt(void *adata);		// called when A's timer goes off 
-void A_init(int ssthresh, int cwnd);							// called once (only) to do any initialization 
+void A_init(int param1, int param2, float loss);	// called once (only) to do any initialization 
 void B_input(pkt packet);				// called from layer 3, when a packet arrives for layer 4
 void B_init();							// called once (only) to do any initialization 
 
