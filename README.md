@@ -31,22 +31,22 @@ cwndHSFinal1000.csv: csv of \<cwnd>,\<state> for every transmission round with 1
 ### Input
 
 - Number of packets
-``
+    - number of packets to send in simulation
 - Loss probability
-    - this is for number of packets in transmission
-``
+    - a probability function variable that changes probability based on number of packets in transmission at a given time.
+    - equation = -(1+lossprob)^(-1* \<packets in flight>) + 1
 - Average time between sending packets
-``
+    - average time the sender waits before sending/queueing a new packet
 - Trace level
-``
+    - an int to print trace at different levels
 
 ### High Speed TCP
 
-``
+`tasks_tcp_HIGHSPEED highwin <High_Window> lowwin <Low_Window>`
 
 ### Standard TCP
 
-``
+`tasks_tcp cwnd <initial cwnd> ssthresh <ssthresh>`
 
 ## Output
 The output generates a comma separated file for each transmission round, with the cwnd and the State. 
